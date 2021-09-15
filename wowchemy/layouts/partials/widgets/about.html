@@ -44,28 +44,26 @@
         {{ end }}
       </div>
 
-      <ul class="network-icon" aria-hidden="true">
-        {{ range $person.social }}
-        {{ $pack := or .icon_pack "fas" }}
-        {{ $pack_prefix := $pack }}
-        {{ if in (slice "fab" "fas" "far" "fal") $pack }}
-          {{ $pack_prefix = "fa" }}
+      {{ $display_icons := false }}
+      {{ $show_icon := false }}
+      {{ range $person.social }}
+        {{ $show_icon = .display.about_widget | default true }}
+        {{ if $show_icon }}
+          {{ if not $display_icons }}
+            <ul class="network-icon" aria-hidden="true">
+          {{ end }}
+          {{ $display_icons = true }}
+          {{ $social_link := partial "functions/get_social_link" . }}
+            <li>
+              <a href="{{ $social_link.link | safeURL }}" {{ $social_link.target | safeHTMLAttr }} aria-label="{{ $social_link.aria_label }}">
+                <i class="{{ $social_link.icon_pack }} {{ $social_link.pack_prefix }}-{{ $social_link.icon }} big-icon"></i>
+              </a>
+            </li>
         {{ end }}
-        {{ $link := .link }}
-        {{ $scheme := (urls.Parse $link).Scheme }}
-        {{ $target := "" }}
-        {{ if not $scheme }}
-          {{ $link = .link | relLangURL }}
-        {{ else if in (slice "http" "https") $scheme }}
-          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
-        {{ end }}
-        <li>
-          <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} aria-label="{{ .icon }}">
-            <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} big-icon"></i>
-          </a>
-        </li>
-        {{ end }}
-      </ul>
+      {{ end }}
+      {{ if $display_icons }}
+        </ul>
+      {{ end }}
 
     </div>
   </div>
